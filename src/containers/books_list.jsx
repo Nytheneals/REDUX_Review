@@ -1,14 +1,10 @@
 import React, { Component } from "react";
-
+import { connect } from "react-redux";
 // THIS COMPONENT RENDERS THE BOOKLIST
 class BooksList extends Component {
-  state = {
-    books: [{ title: "javascript" }, { title: "Script" }]
-  };
-
-  // HELPER FUNCTION FOR BOOKLIST
+  // HELPER FoiUNCTION FOR BOOKLIST
   renderList() {
-    return this.state.books.map(book => {
+    return this.props.books.map(book => {
       return (
         <li key={book.title} className="list-group-item">
           {book.title}
@@ -21,4 +17,10 @@ class BooksList extends Component {
   }
 }
 
-export default BooksList;
+function mapStateToProps(state) {
+  return {
+    books: state.books
+  };
+}
+
+export default connect(mapStateToProps)(BooksList);
