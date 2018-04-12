@@ -7,7 +7,7 @@
 // ReactDOM.render(<App />, document.getElementById("root"));
 // registerServiceWorker();
 
-import { combineReducers, createStore } from "redux";
+import { applyMiddleware, createStore } from "redux";
 
 // REDUX SUMMARY
 
@@ -17,41 +17,37 @@ import { combineReducers, createStore } from "redux";
 // 4.DISPATCH
 
 // 1.CREATING A REDUCER (PARAMS ARE STATE & ACTION FROM DSIPATCHER)
-// IN THE USER REDUCER I'M PASSING DEFAULT STATE AS AN OBJECT
-const userReducer = (state = {}, action) => {
-  switch (action.type) {
-    case "NAME_CHANGE": {
-      state = { ...state, name: action.payload };
-      break;
-    }
-    case "AGE_CHANGE": {
-      state = { ...state, age: action.payload };
-      break;
-    }
+
+const reducer = (initialState = 0, action) => {
+  if (action.type === "INC") {
+    return initialState + 1;
   }
-  return state;
-};
-// IN THE TWEETS REDUCER I'M PASSING DEFAULT STATE AS AN ARRAY
-const tweetsReducer = (state = [], action) => {
-  return state;
+  if (action.type === "DEC") {
+    return initialState - 1;
+  }
+  return initialState;
 };
 
-// COMBINED REDUCERS
-const rootReducers = combineReducers({
-  user: userReducer,
-  tweets: tweetsReducer
-});
+// CUSTOM MIDDLEWARE
+const logger = store => next => action => {
+  console.log("action fired", action);
+};
+
+const middleware = applyMiddleware(logger);
 
 // 2.WE CREATE A STORE BY CALLING CREATESTORE AND PASSING  A REDUCER/ ROOT REDUCER AND STATE
-const store = createStore(rootReducers);
+const store = createStore(reducer, 1, middleware);
 
 // 3.CREATED A LISTENER (LOGS STATE)
-store.subscribe(() => {
-  console.log("The store changed");
-  console.table(store.getState());
-});
+// store.subscribe(() => {
+//   console.log("The store changed");
+//   console.log(store.getState());
+// });
 
 // 4.DISPATCH (TAKES IN A ACTION TYPE & PAYLOAD) // ACTION CREATOR
-store.dispatch({ type: "NAME_CHANGE", payload: "WILL" });
-store.dispatch({ type: "AGE_CHANGE", payload: 200 });
-store.dispatch({ type: "AGE_CHANGE", payload: 240 });
+store.dispatch({ type: "INC" });
+store.dispatch({ type: "INC" });
+store.dispatch({ type: "INC" });
+store.dispatch({ type: "DEC" });
+store.dispatch({ type: "DEC" });
+store.dispatch({ type: "DEC" });
