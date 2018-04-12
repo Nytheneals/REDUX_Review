@@ -7,7 +7,7 @@
 // ReactDOM.render(<App />, document.getElementById("root"));
 // registerServiceWorker();
 
-import { createStore } from "redux";
+import { combineReducers, createStore } from "redux";
 
 // REDUX SUMMARY
 
@@ -17,30 +17,41 @@ import { createStore } from "redux";
 // 4.DISPATCH
 
 // 1.CREATING A REDUCER (PARAMS ARE STATE & ACTION FROM DSIPATCHER)
-const reducer = (state, action) => {
-  if (action.type === "INC") {
-    return state + action.payload;
+// IN THE USER REDUCER I'M PASSING DEFAULT STATE AS AN OBJECT
+const userReducer = (state = {}, action) => {
+  switch (action.type) {
+    case "NAME_CHANGE": {
+      state = { ...state, name: action.payload };
+      break;
+    }
+    case "AGE_CHANGE": {
+      state = { ...state, age: action.payload };
+      break;
+    }
   }
-  if (action.type === "DEC") {
-    return state - action.payload;
-  }
-  if (action.type === "MUT") {
-    return state * action.payload;
-  }
-  return state; // FALL BACK INCASE THIS FAILS
+  return state;
+};
+// IN THE TWEETS REDUCER I'M PASSING DEFAULT STATE AS AN ARRAY
+const tweetsReducer = (state = [], action) => {
+  return state;
 };
 
+// COMBINED REDUCERS
+const rootReducers = combineReducers({
+  user: userReducer,
+  tweets: tweetsReducer
+});
+
 // 2.WE CREATE A STORE BY CALLING CREATESTORE AND PASSING  A REDUCER/ ROOT REDUCER AND STATE
-const store = createStore(reducer, 0);
+const store = createStore(rootReducers);
 
 // 3.CREATED A LISTENER (LOGS STATE)
 store.subscribe(() => {
-  console.log("The store changed", store.getState());
+  console.log("The store changed");
+  console.table(store.getState());
 });
 
 // 4.DISPATCH (TAKES IN A ACTION TYPE & PAYLOAD) // ACTION CREATOR
-store.dispatch({ type: "INC", payload: 2 });
-store.dispatch({ type: "INC", payload: 200 });
-store.dispatch({ type: "DEC", payload: 12 });
-store.dispatch({ type: "INC", payload: 200 });
-store.dispatch({ type: "MUT", payload: 12 });
+store.dispatch({ type: "NAME_CHANGE", payload: "WILL" });
+store.dispatch({ type: "AGE_CHANGE", payload: 200 });
+store.dispatch({ type: "AGE_CHANGE", payload: 240 });
