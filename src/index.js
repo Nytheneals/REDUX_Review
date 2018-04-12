@@ -1,14 +1,9 @@
-// import React from "react";
-// import ReactDOM from "react-dom";
-// import "./index.css";
-// import App from "./app";
-// import registerServiceWorker from "./registerServiceWorker";
+import { applyMiddleware, createStore } from "redux";
+import axios from "axios";
+import { createLogger } from "redux-logger";
+import thunk from "redux-thunk";
 
-// ReactDOM.render(<App />, document.getElementById("root"));
-// registerServiceWorker();
-
-import { combineReducers, createStore } from "redux";
-
+// REDUX THUNK ALLOWS USE TO CREATE ACTION CREATORS
 // REDUX SUMMARY
 
 // 1.REDUCER
@@ -16,42 +11,70 @@ import { combineReducers, createStore } from "redux";
 // 3.SUBSCRIBE / LISTENER
 // 4.DISPATCH
 
+// INITIAL STATE
+const initialState = {
+  fetching: false,
+  fetched: false,
+  users: [],
+  error: null
+};
+
 // 1.CREATING A REDUCER (PARAMS ARE STATE & ACTION FROM DSIPATCHER)
-// IN THE USER REDUCER I'M PASSING DEFAULT STATE AS AN OBJECT
-const userReducer = (state = {}, action) => {
+
+const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case "NAME_CHANGE": {
-      state = { ...state, name: action.payload };
+    case "FETCH_USERS_START": {
+      return {
+        ...state,
+        fetching: true,
+        fetched: false,
+        users: [],
+        error: null
+      };
       break;
     }
-    case "AGE_CHANGE": {
-      state = { ...state, age: action.payload };
+    case "FETCH_USERS_ERROR": {
+      return {
+        ...state,
+        fetching: true,
+        fetched: false,
+        error: action.payload
+      };
+      break;
+    }
+
+    case "RECEIVE_USERS": {
+      return {
+        ...state,
+        fetching: false,
+        fetched: true,
+        users: action.payload
+      };
       break;
     }
   }
   return state;
 };
-// IN THE TWEETS REDUCER I'M PASSING DEFAULT STATE AS AN ARRAY
-const tweetsReducer = (state = [], action) => {
-  return state;
-};
+// CUSTOM MIDDLEWARE
 
-// COMBINED REDUCERS
-const rootReducers = combineReducers({
-  user: userReducer,
-  tweets: tweetsReducer
-});
+const middleware = applyMiddleware(thunk, createLogger());
 
 // 2.WE CREATE A STORE BY CALLING CREATESTORE AND PASSING  A REDUCER/ ROOT REDUCER AND STATE
-const store = createStore(rootReducers);
-
-// 3.CREATED A LISTENER (LOGS STATE)
-store.subscribe(() => {
-  console.log("The store changed");
-  console.table(store.getState());
-});
+const store = createStore(reducer, middleware);
 
 // 4.DISPATCH (TAKES IN A ACTION TYPE & PAYLOAD) // ACTION CREATOR
-store.dispatch({ type: "NAME_CHANGE", payload: "WILL" });
-store.dispatch({ type: "AGE_CHANGE", payload: 200 });
-store.dispatch({ type: "AGE_CHANGE", payload: 240 });
+// THUNK MIDDLEWARE LETS US HAVE MULTIPLE ACTIONS IN ONE DISPATCH FUNCTION
+store.dispatch(dispatch => {
+  // ACTION ONE
+  dispatch({ type: "FETCH_USERS_START" });
+  axios
+    .get("http://5826ed963900d612000138bd.mockapi.io/items")
+    .then(response => {
+      // ACTION TWO
+      dispatch({ type: "RECEIVE_USERS", payload: response.data });
+    })
+    .catch(err => {
+      // ACTION THREE
+      dispatch({ type: "FETCH_USERS_ERROR", payload: err });
+    });
+});
