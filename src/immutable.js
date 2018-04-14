@@ -1,7 +1,9 @@
 const a = { name: "Nathaneals", age: 35 };
 const b = Object.assign({}, a, { age: 45 });
 
-console.log(a, b); // {name: "Nathaneals", age: 35} {name: "Nathaneals", age: 45}
+console.log(a, b);
+// {name: "Nathaneals", age: 35}
+// {name: "Nathaneals", age: 45}
 
 console.log(Object.keys(a));
 console.log(Object.values(a));
@@ -25,7 +27,8 @@ import { createStore } from "redux";
 // 3.SUBSCRIBE / LISTENER
 // 4.DISPATCH
 
-// 1.CREATING A REDUCER (PARAMS ARE STATE & ACTION FROM DSIPATCHER)
+// 1.CREATING A REDUCER
+// (PARAMS ARE STATE & ACTION FROM DSIPATCHER)
 const reducer = (state, action) => {
   if (action.type === "INC") {
     return state + action.payload;
@@ -36,7 +39,8 @@ const reducer = (state, action) => {
   return state;
 };
 
-// 2.WE CREATE A STORE BY CALLING CREATESTORE AND PASSING  A REDUCER/ ROOT REDUCER AND STATE
+// 2.WE CREATE A STORE BY CALLING CREATESTORE AND PASSING
+// A REDUCER/ ROOT REDUCER AND STATE
 const store = createStore(reducer, 0);
 
 // 3.CREATED A LISTENER (LOGS STATE)
